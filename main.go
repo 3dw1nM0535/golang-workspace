@@ -2,28 +2,66 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
-const favColor string = "blue"
+type Circle struct {
+	Radius float64
+}
+
+func (c Circle) Area() float64 {
+	return math.Pi * math.Pow(c.Radius, 2)
+}
+
+func (c Circle) String() string {
+	return fmt.Sprintf("Circle {Radius: %.2f}", c.Radius)
+}
+
+type Square struct {
+	Width  float64
+	Height float64
+}
+
+func (s Square) Area() float64 {
+	return s.Width * s.Height
+}
+
+func (s Square) String() string {
+	return fmt.Sprintf("Square {Width: %.2f, Height: %.2f}", s.Width, s.Height)
+}
+
+type Sizer interface {
+	Area() float64
+}
+
+type Shaper interface {
+	Sizer
+	fmt.Stringer
+}
 
 func main() {
-	var guess string
-	// Create an input loop
-	for {
-		// Ask the user to guess the favorite color
-		fmt.Println("Guess my favorite color...")
-		// Try to read a line of input from user. Print out the error 0
-		if _, err := fmt.Scanln(&guess); err != nil {
-			fmt.Printf("%s\n", err)
-			return
-		}
-		// Did they guess the correct answer
-		if favColor == guess {
-			// They guessed right!
-			fmt.Printf("%q is my favorite color!\n", favColor)
-			return
-		}
-		// Wrong! Have the at the guess loop
-		fmt.Printf("Sorry, %q is not my favorite color. Guess again!\n", guess)
+	c := Circle{
+		Radius: 10,
 	}
+	PrintArea(c)
+
+	s := Square{
+		Width:  10,
+		Height: 10,
+	}
+	PrintArea(s)
+
+	l := Less(c, s)
+	fmt.Printf("%v is the smallest\n", l)
+}
+
+func Less(s1, s2 Sizer) Sizer {
+	if s1.Area() < s2.Area() {
+		return s1
+	}
+	return s2
+}
+
+func PrintArea(s Shaper) {
+	fmt.Printf("area of %s is %.2f\n", s.String(), s.Area())
 }
